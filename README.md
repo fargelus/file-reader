@@ -1,4 +1,4 @@
-# tk-file-reader
+# file-reader
 File Reader
 
 ### Requirements
