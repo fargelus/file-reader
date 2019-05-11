@@ -4,4 +4,4 @@ File Reader
 ### Requirements
 _Tk_ - latest
 
-File::Slurp - 9999.27
+_File::Slurp_ - 9999.27
