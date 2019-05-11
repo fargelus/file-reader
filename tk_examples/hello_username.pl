@@ -14,13 +14,6 @@ $frame->pack(-expand => 1);
 
 MainLoop;
 
-sub showName {
-  my ($frame, $name) = @_;
-
-  my $greeting = $frame->Label(-text => "Hello, $name");
-  $greeting->pack;
-}
-
 sub buildApp {
   my $top_frame = shift;
 
@@ -33,8 +26,14 @@ sub buildApp {
   $entry->pack;
 
   $inner_frame->pack(-expand => 1);
+
+  my $greeting;
+  my $lbl = $top_frame->Label(-textvariable => \$greeting);
+  $lbl->pack(-side => 'left');
+
   $top_frame->Button(-text => 'Ok', -command => sub {
-    my $entry_text = $entry->get();
-    showName($top_frame, $entry_text);
+    my $name = $entry->get();
+    $name = 'stranger' unless($name);
+    $greeting = "Hello, $name!";
   })->pack(-pady => 5, -side => 'right');
 }
