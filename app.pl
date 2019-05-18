@@ -7,26 +7,47 @@ use Tk::FileSelect;
 use Cwd;
 use File::Slurp;
 
-my $mw = MainWindow->new;
-$mw->geometry('300x200');
-$mw->title('File Reader');
-buildApp($mw);
+main();
 
 MainLoop;
 
-sub buildApp {
-  my $win = shift;
+sub main {
+  my $mw = MainWindow->new;
+  initWindow($mw);
 
-  my $text_area = $win->Text();
+  my $text_area = $mw->Text();
 
-  my $file_to_open;
-  my $btn = $win->Button(-text => 'Open', -command => sub {
-    my $content = readFileContent($win);
+  my ($save_btn, $open_btn) = packBtns($mw);
+  $open_btn->configure(-command => sub {
+    my $content = readFileContent($mw);
+    toggleSaveBtnState($save_btn, $content);
     $text_area->Contents($content);
   });
-  $btn->pack(-side => 'bottom', -anchor => 'e');
 
   $text_area->pack(-side => 'top');
+}
+
+sub initWindow {
+  my $win = shift;
+
+  $win->geometry('300x200');
+  $win->title('File Reader');
+}
+
+sub packBtns {
+  my $mw = shift;
+
+  my $save_btn = $mw->Button(-text => 'Save', -state => 'disabled');
+  my $open_btn = $mw->Button(-text => 'Open');
+
+  my %btn_pos = (
+    -side => 'bottom',
+    -anchor => 'e',
+  );
+  $save_btn->pack(%btn_pos);
+  $open_btn->pack(%btn_pos);
+
+  return ($save_btn, $open_btn);
 }
 
 sub readFileContent {
@@ -43,4 +64,11 @@ sub getUserSelectedFile {
 
   my $f_select = $mw->FileSelect(-directory => getcwd);
   $f_select->Show;
+}
+
+sub toggleSaveBtnState {
+  my ($btn, $content) = @_;
+
+  my $state = $content ? 'normal' : 'disabled';
+  $btn->configure(-state => $state);
 }
