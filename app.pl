@@ -15,15 +15,20 @@ sub main {
   my $mw = MainWindow->new;
   initWindow($mw);
 
-  my $text_area = $mw->Text();
+  my $text_area = $mw->Text;
+  my $file_path = $mw->Label;
 
   my ($save_btn, $open_btn) = packBtns($mw);
   $open_btn->configure(-command => sub {
-    my $content = readFileContent($mw);
+    my $file_to_open = getUserSelectedFile($mw);
+    $file_path->configure(-text => $file_to_open);
+
+    my $content = readFileContent($file_to_open);
     toggleSaveBtnState($save_btn, $content);
     $text_area->Contents($content);
   });
 
+  $file_path->pack(-side => 'top', -pady => 5);
   $text_area->pack(-side => 'top');
 }
 
@@ -31,7 +36,7 @@ sub initWindow {
   my $win = shift;
 
   $win->geometry('300x200');
-  $win->title('File Reader');
+  $win->title('File Viewer');
 }
 
 sub packBtns {
@@ -47,16 +52,7 @@ sub packBtns {
   $save_btn->pack(%btn_pos);
   $open_btn->pack(%btn_pos);
 
-  return ($save_btn, $open_btn);
-}
-
-sub readFileContent {
-  my $win = shift;
-
-  my $file_to_open = getUserSelectedFile($win);
-  return '' unless $file_to_open;
-
-  join '', read_file($file_to_open);
+  ($save_btn, $open_btn);
 }
 
 sub getUserSelectedFile {
@@ -64,6 +60,13 @@ sub getUserSelectedFile {
 
   my $f_select = $mw->FileSelect(-directory => getcwd);
   $f_select->Show;
+}
+
+sub readFileContent {
+  my $file_to_open = shift;
+
+  return '' unless($file_to_open);
+  join '', read_file($file_to_open);
 }
 
 sub toggleSaveBtnState {
