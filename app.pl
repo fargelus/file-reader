@@ -16,19 +16,24 @@ sub main {
   initWindow($mw);
 
   my $text_area = $mw->Text;
-  my $file_path = $mw->Label;
+  my $filepath;
+  my $file_path_lbl = $mw->Label(-textvariable => \$filepath);
 
   my ($save_btn, $open_btn) = packBtns($mw);
   $open_btn->configure(-command => sub {
-    my $file_to_open = getUserSelectedFile($mw);
-    $file_path->configure(-text => $file_to_open);
+    $filepath = getUserSelectedFile($mw);
 
-    my $content = readFileContent($file_to_open);
+    my $content = readFileContent($filepath);
     toggleSaveBtnState($save_btn, $content);
     $text_area->Contents($content);
   });
 
-  $file_path->pack(-side => 'top', -pady => 5);
+  $save_btn->configure(-command => sub {
+    my $updated_content = $text_area->Contents();
+    write_file($filepath, $updated_content);
+  });
+
+  $file_path_lbl->pack(-side => 'top', -pady => 5);
   $text_area->pack(-side => 'top');
 }
 
