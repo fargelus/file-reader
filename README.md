@@ -1,5 +1,5 @@
-# file-reader
-File Reader
+# file-viewer
+File Viewer
 
 ### Requirements
 _Tk_ - latest
