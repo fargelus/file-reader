@@ -6,6 +6,7 @@ use Tk;
 use Tk::FileSelect;
 use Cwd;
 use File::Slurp;
+use File::Basename;
 
 main();
 
@@ -21,7 +22,7 @@ sub main {
 
   my ($save_btn, $open_btn) = packBtns($mw);
   $open_btn->configure(-command => sub {
-    $filepath = getUserSelectedFile($mw);
+    $filepath = getUserSelectedFile($mw, $filepath);
 
     my $content = readFileContent($filepath);
     toggleSaveBtnState($save_btn, $content);
@@ -30,7 +31,9 @@ sub main {
 
   $save_btn->configure(-command => sub {
     my $updated_content = $text_area->Contents();
-    write_file($filepath, $updated_content);
+    if (write_file($filepath, $updated_content)) {
+      $mw->messageBox(-message => 'File was saved');
+    }
   });
 
   $file_path_lbl->pack(-side => 'top', -pady => 5);
@@ -61,9 +64,10 @@ sub packBtns {
 }
 
 sub getUserSelectedFile {
-  my $mw = shift;
+  my ($mw, $path) = @_;
 
-  my $f_select = $mw->FileSelect(-directory => getcwd);
+  my $dir = $path ? dirname($path) : getcwd;
+  my $f_select = $mw->FileSelect(-directory => $dir);
   $f_select->Show;
 }
 
