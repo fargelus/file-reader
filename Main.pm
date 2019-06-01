@@ -29,23 +29,27 @@ sub main {
 
   $open_btn->configure(-command => sub {
     $filepath = getUserSelectedFile($mw, $filepath);
+    my $content;
+    my $is_image = isImage($filepath);
 
-    if (isImage($filepath)) {
+    if ($is_image) {
       $text_area->packForget;
 
       my $ext = getFileExtension($filepath);
       $photo_obj->configure(-file => $filepath, -format => $ext);
-      
+
       $img_btn->configure(-image => $photo_obj);
       $img_btn->pack(-side => 'top');
     } else {
       $img_btn->packForget;
       packTextArea($text_area);
 
-      my $content = readFileContent($filepath);
-      toggleSaveBtnState($save_btn, $content);
+      $content = readFileContent($filepath);
       $text_area->Contents($content);
     }
+
+    my $state = defineSaveBtnState($content, $is_image);
+    $save_btn->configure(-state => $state);
   });
 
   $save_btn->configure(-command => sub {
@@ -102,6 +106,8 @@ sub packBtns {
 sub isImage {
   my $file = shift;
 
+  return 0 unless ($file);
+
   $file =~ /.(png|jpe?g|gif)$/i;
 }
 
@@ -131,11 +137,12 @@ sub readFileContent {
   join '', read_file($file_to_open);
 }
 
-sub toggleSaveBtnState {
-  my ($btn, $content) = @_;
+sub defineSaveBtnState {
+  my ($content, $is_image) = @_;
 
-  my $state = $content ? 'normal' : 'disabled';
-  $btn->configure(-state => $state);
+  my $state = 'normal';
+  $state = 'disabled' if ($is_image || !$content);
+  $state;
 }
 
 1;
