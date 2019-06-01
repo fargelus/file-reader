@@ -10,7 +10,6 @@ use Tk::JPEG;
 use Cwd;
 use File::Slurp;
 use File::Basename;
-use File::HomeDir;
 
 sub main {
   my $mw = MainWindow->new;
@@ -36,6 +35,7 @@ sub main {
 
       my $ext = getFileExtension($filepath);
       $photo_obj->configure(-file => $filepath, -format => $ext);
+      
       $img_btn->configure(-image => $photo_obj);
       $img_btn->pack(-side => 'top');
     } else {
@@ -47,15 +47,15 @@ sub main {
       $text_area->Contents($content);
     }
   });
-  #
-  # $save_btn->configure(-command => sub {
-  #   my $updated = $text_area->Contents();
-  #
-  #   my $msg = 'File was saved';
-  #   $msg = 'Error, while saving file' unless (write_file($filepath, $updated));
-  #   $mw->messageBox(-message => $msg);
-  # });
-  #
+
+  $save_btn->configure(-command => sub {
+    my $updated = $text_area->Contents();
+
+    my $msg = 'File was saved';
+    $msg = 'Error, while saving file' unless (write_file($filepath, $updated));
+    $mw->messageBox(-message => $msg);
+  });
+
   $file_path_lbl->pack(-side => 'top', -pady => 5);
   packTextArea($text_area);
 
