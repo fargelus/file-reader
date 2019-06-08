@@ -36,6 +36,7 @@ sub main {
       $text_area->packForget;
 
       my $ext = getFileExtension($filepath);
+      $photo_obj->blank;
       $photo_obj->configure(-file => $filepath, -format => $ext);
 
       $img_btn->configure(-image => $photo_obj);
@@ -69,7 +70,6 @@ sub main {
 sub initWindowMeta {
   my $win = shift;
 
-  $win->geometry('300x200');
   $win->title('File Viewer');
 }
 
