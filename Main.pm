@@ -31,6 +31,8 @@ sub main {
 
     if ($filepath) {
       viewFileContent();
+    } else {
+      restoreToDefaultState();
     }
   });
 
@@ -50,7 +52,6 @@ sub initWindowMeta {
   my $win = $G_WIDGETS{'Window'};
 
   $win->title('File Viewer');
-
   $win->bind('<Configure>' => sub {
     my $w = shift;
     $w->minsize($w->Width, $w->Height);
@@ -127,6 +128,12 @@ sub viewFileContent {
 
   my $state = defineSaveBtnState($content, $is_image);
   $G_WIDGETS{'Save_btn'}->configure(-state => $state);
+}
+
+sub restoreToDefaultState {
+  $G_WIDGETS{'Text'}->packForget;
+  $G_WIDGETS{'Img_btn'}->packForget;
+  $G_WIDGETS{'Label'}->packForget;
 }
 
 sub isImage {
