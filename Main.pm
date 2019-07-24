@@ -20,6 +20,7 @@ sub main {
 
   initWindowMeta();
   initUI();
+  packControlBtns();
 
   my $filepath;
   my $file_path_lbl = $G_WIDGETS{'Label'};
@@ -66,7 +67,6 @@ sub initUI {
   $G_WIDGETS{'Label'} = $mw->Label;
   $G_WIDGETS{'Photo'} = $mw->Photo;
   $G_WIDGETS{'Img_btn'} = $mw->Button;
-  packControlBtns();
 }
 
 sub packControlBtns {
