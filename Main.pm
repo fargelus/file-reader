@@ -15,45 +15,20 @@ my @G_WIDGETS_LIST = qw /Window Label Text Photo Img_btn Open_btn Save_btn/;
 my %G_WIDGETS = map {$_ => undef} @G_WIDGETS_LIST;
 
 sub main {
-  my $mw = MainWindow->new;
-  $G_WIDGETS{'Window'} = $mw;
-
-  initWindowMeta();
+  initWindow();
   initUI();
   packControlBtns();
-
-  my $filepath;
-  my $file_path_lbl = $G_WIDGETS{'Label'};
-  $file_path_lbl->configure(-textvariable => \$filepath);
-
-  my $open_btn = $G_WIDGETS{'Open_btn'};
-  $open_btn->configure(-command => sub {
-    $filepath = getUserSelectedFile($filepath);
-
-    if ($filepath) {
-      viewFileContent();
-    } else {
-      restoreToDefaultState();
-    }
-  });
-
-  my $save_btn = $G_WIDGETS{'Save_btn'};
-  $save_btn->configure(-command => sub {
-    my $updated = $G_WIDGETS{'Text'}->Contents();
-
-    my $msg = 'File was saved';
-    $msg = 'Error, while saving file' unless (write_file($filepath, $updated));
-    $mw->messageBox(-message => $msg);
-  });
+  setupControlBtns();
 
   MainLoop;
 }
 
-sub initWindowMeta {
-  my $win = $G_WIDGETS{'Window'};
+sub initWindow {
+  my $mw = MainWindow->new;
+  $G_WIDGETS{'Window'} = $mw;
 
-  $win->title('File Viewer');
-  $win->bind('<Configure>' => sub {
+  $mw->title('File Viewer');
+  $mw->bind('<Configure>' => sub {
     my $w = shift;
     $w->minsize($w->Width, $w->Height);
     $w->bind('<Configure>' => sub {});
@@ -86,6 +61,41 @@ sub packControlBtns {
 
   $G_WIDGETS{'Save_btn'} = $save_btn;
   $G_WIDGETS{'Open_btn'} = $open_btn;
+}
+
+sub setupControlBtns {
+  defineOpenBtnCommand();
+  defineSaveBtnCommand();
+}
+
+sub defineOpenBtnCommand {
+  my $filepath;
+  my $file_path_lbl = $G_WIDGETS{'Label'};
+  $file_path_lbl->configure(-textvariable => \$filepath);
+
+  my $open_btn = $G_WIDGETS{'Open_btn'};
+  $open_btn->configure(-command => sub {
+    $filepath = getUserSelectedFile($filepath);
+
+    if ($filepath) {
+      viewFileContent();
+    } else {
+      restoreToDefaultState();
+    }
+  });
+}
+
+sub defineSaveBtnCommand {
+  my $save_btn = $G_WIDGETS{'Save_btn'};
+  my $mw = $G_WIDGETS{'Window'};
+  $save_btn->configure(-command => sub {
+    my $updated = $G_WIDGETS{'Text'}->Contents();
+
+    my $filepath = $G_WIDGETS{'Label'}->cget('-text');
+    my $msg = 'File was saved';
+    $msg = 'Error, while saving file' unless (write_file($filepath, $updated));
+    $mw->messageBox(-message => $msg);
+  });
 }
 
 sub getUserSelectedFile {
