@@ -85,19 +85,6 @@ sub defineOpenBtnCommand {
   });
 }
 
-sub defineSaveBtnCommand {
-  my $save_btn = $G_WIDGETS{'Save_btn'};
-  my $mw = $G_WIDGETS{'Window'};
-  $save_btn->configure(-command => sub {
-    my $updated = $G_WIDGETS{'Text'}->Contents();
-
-    my $filepath = $G_WIDGETS{'Label'}->cget('-text');
-    my $msg = 'File was saved';
-    $msg = 'Error, while saving file' unless (write_file($filepath, $updated));
-    $mw->messageBox(-message => $msg);
-  });
-}
-
 sub getUserSelectedFile {
   my $path = shift;
 
@@ -117,6 +104,7 @@ sub viewFileContent {
   my $is_image = isImage($filepath);
   my $content;
 
+  centerWindow();
   $file_path_lbl->pack(-side => 'top', -pady => 5);
   if ($is_image) {
     $text_area->packForget;
@@ -140,12 +128,6 @@ sub viewFileContent {
   $G_WIDGETS{'Save_btn'}->configure(-state => $state);
 }
 
-sub restoreToDefaultState {
-  $G_WIDGETS{'Text'}->packForget;
-  $G_WIDGETS{'Img_btn'}->packForget;
-  $G_WIDGETS{'Label'}->packForget;
-}
-
 sub isImage {
   my $file = shift;
 
@@ -167,12 +149,49 @@ sub readFileContent {
   join '', read_file($file_to_open);
 }
 
+sub centerWindow {
+  my $mw = $G_WIDGETS{'Window'};
+
+  $mw->bind('<Configure>' => sub {
+    my $w = shift;
+
+    my $width = $w->Width;
+    my $height = $w->Height;
+    my $centerX = int($w->screenwidth / 2 - $width / 2);
+    my $centerY = int($w->screenheight / 2 - $height / 2);
+
+    my $centerCoords = '+' . "$centerX" . '+' . "$centerY";
+    $w->geometry("$width" . 'x' . "$height" . $centerCoords);
+
+    $w->bind('<Configure>' => sub {});
+  });
+}
+
 sub defineSaveBtnState {
   my ($content, $is_image) = @_;
 
   my $state = 'normal';
   $state = 'disabled' if ($is_image || !$content);
   $state;
+}
+
+sub restoreToDefaultState {
+  $G_WIDGETS{'Text'}->packForget;
+  $G_WIDGETS{'Img_btn'}->packForget;
+  $G_WIDGETS{'Label'}->packForget;
+}
+
+sub defineSaveBtnCommand {
+  my $save_btn = $G_WIDGETS{'Save_btn'};
+  my $mw = $G_WIDGETS{'Window'};
+  $save_btn->configure(-command => sub {
+    my $updated = $G_WIDGETS{'Text'}->Contents();
+
+    my $filepath = $G_WIDGETS{'Label'}->cget('-text');
+    my $msg = 'File was saved';
+    $msg = 'Error, while saving file' unless (write_file($filepath, $updated));
+    $mw->messageBox(-message => $msg);
+  });
 }
 
 1;
